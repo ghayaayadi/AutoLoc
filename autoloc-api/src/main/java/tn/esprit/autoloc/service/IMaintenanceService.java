@@ -5,13 +5,13 @@ import tn.esprit.autoloc.domain.Maintenance;
 
 public interface IMaintenanceService {
 
-    Maintenance create(Maintenance entity);
+    Maintenance create(Maintenance entite);
 
-    Maintenance getById(Long id);
+    Maintenance findById(Long id);
 
-    List<Maintenance> getAll();
+    List<Maintenance> findAll();
 
-    Maintenance update(Long id, Maintenance entity);
+    Maintenance update(Long id, Maintenance entite);
 
-    void delete(Long id);
+    void deleteById(Long id);
 }

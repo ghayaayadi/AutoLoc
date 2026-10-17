@@ -5,13 +5,7 @@ import tn.esprit.autoloc.domain.Paiement;
 
 public interface IPaiementService {
 
-    Paiement create(Paiement entity);
+    Paiement findById(Long id);
 
-    Paiement getById(Long id);
-
-    List<Paiement> getAll();
-
-    Paiement update(Long id, Paiement entity);
-
-    void delete(Long id);
+    List<Paiement> findAll();
 }

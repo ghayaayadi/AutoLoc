@@ -5,13 +5,13 @@ import tn.esprit.autoloc.domain.Equipement;
 
 public interface IEquipementService {
 
-    Equipement create(Equipement entity);
+    Equipement create(Equipement entite);
 
-    Equipement getById(Long id);
+    Equipement findById(Long id);
 
-    List<Equipement> getAll();
+    List<Equipement> findAll();
 
-    Equipement update(Long id, Equipement entity);
+    Equipement update(Long id, Equipement entite);
 
-    void delete(Long id);
+    void deleteById(Long id);
 }

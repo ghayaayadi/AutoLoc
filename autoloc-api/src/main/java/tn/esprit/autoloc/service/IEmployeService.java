@@ -5,13 +5,13 @@ import tn.esprit.autoloc.domain.Employe;
 
 public interface IEmployeService {
 
-    Employe create(Employe entity);
+    Employe create(Employe entite);
 
-    Employe getById(Long id);
+    Employe findById(Long id);
 
-    List<Employe> getAll();
+    List<Employe> findAll();
 
-    Employe update(Long id, Employe entity);
+    Employe update(Long id, Employe entite);
 
-    void delete(Long id);
+    void deleteById(Long id);
 }
