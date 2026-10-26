@@ -1,12 +1,12 @@
 package tn.esprit.autoloc.domain;
-
+import java.util.HashSet;
+import java.util.Set;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "equipement")
@@ -20,9 +20,10 @@ public class Equipement {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idEquipement;
 
+    @JsonIgnore
+    @ManyToMany(mappedBy = "equipements")
+    private Set<Vehicule> vehicules = new HashSet<>();
+
     @Column(nullable = false, length = 100)
     private String libelle;
-
-    @ManyToMany(mappedBy = "equipements")
-    private List<Vehicule> vehicules = new ArrayList<>();
 }

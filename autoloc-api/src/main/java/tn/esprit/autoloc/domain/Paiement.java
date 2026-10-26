@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -21,6 +20,10 @@ public class Paiement {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idPaiement;
 
+    @ManyToOne
+    @JoinColumn(name = "id_contrat", nullable = false)
+    private Contrat contrat;
+
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal montant;
 
@@ -30,8 +33,4 @@ public class Paiement {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private ModePaiement modePaiement;
-
-    @ManyToOne
-    @JoinColumn(name = "id_contrat", nullable = false)
-    private Contrat contrat;
 }

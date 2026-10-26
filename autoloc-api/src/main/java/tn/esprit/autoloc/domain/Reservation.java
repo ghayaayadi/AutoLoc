@@ -1,11 +1,11 @@
 package tn.esprit.autoloc.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import java.time.LocalDate;
 
 @Entity
@@ -20,6 +20,18 @@ public class Reservation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idReservation;
 
+    @ManyToOne
+    @JoinColumn(name = "id_vehicule", nullable = false)
+    private Vehicule vehicule;
+
+    @ManyToOne
+    @JoinColumn(name = "id_client", nullable = false)
+    private Client client;
+
+    @JsonIgnore
+    @OneToOne(mappedBy = "reservation")
+    private Contrat contrat;
+
     @Column(nullable = false)
     private LocalDate dateDebut;
 
@@ -29,15 +41,4 @@ public class Reservation {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private StatutReservation statut;
-
-    @ManyToOne
-    @JoinColumn(name = "id_vehicule", nullable = false)
-    private Vehicule vehicule;
-
-    @ManyToOne
-    @JoinColumn(name = "id_client", nullable = false)
-    private Client client;
-
-    @OneToOne(mappedBy = "reservation")
-    private Contrat contrat;
 }

@@ -1,15 +1,14 @@
 package tn.esprit.autoloc.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
-import java.time.LocalDate;
-
 @Entity
 @Table(name = "client")
 @Getter
@@ -22,6 +21,10 @@ public class Client {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idClient;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "client")
+    private List<Reservation> reservations = new ArrayList<>();
+
     @Column(nullable = false, length = 50)
     private String nom;
 
@@ -31,7 +34,7 @@ public class Client {
     @Column(nullable = false, unique = true, length = 100)
     private String email;
 
-    @Column(length = 20)
+    @Column(nullable = false, length = 20)
     private String telephone;
 
     @Column(nullable = false, unique = true, length = 30)
@@ -39,7 +42,4 @@ public class Client {
 
     @Column(nullable = false)
     private LocalDate dateInscription;
-
-    @OneToMany(mappedBy = "client")
-    private List<Reservation> reservations = new ArrayList<>();
 }
