@@ -5,7 +5,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tn.esprit.autoloc.domain.Equipement;
+import tn.esprit.autoloc.dto.request.EquipementRequest;
+import tn.esprit.autoloc.dto.response.EquipementResponse;
 import tn.esprit.autoloc.exception.ResourceNotFoundException;
+import tn.esprit.autoloc.mapper.EquipementMapper;
 import tn.esprit.autoloc.repository.IEquipementRepository;
 import tn.esprit.autoloc.service.IEquipementService;
 
@@ -14,37 +17,33 @@ import tn.esprit.autoloc.service.IEquipementService;
 public class EquipementServiceImpl implements IEquipementService {
 
     private final IEquipementRepository equipementRepository;
+    private final EquipementMapper equipementMapper;
 
     @Override
     @Transactional
-    public Equipement create(Equipement equipement) {
-        if (equipement.getIdEquipement() != null) {
-            throw new IllegalArgumentException("Un nouveau equipement ne doit pas avoir d'identifiant");
-        }
-        valider(equipement);
-        return equipementRepository.save(equipement);
+    public EquipementResponse create(EquipementRequest request) {
+        Equipement entity = equipementMapper.toEntity(request);
+        return equipementMapper.toResponse(equipementRepository.save(entity));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Equipement findById(Long id) {
-        return equipementRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Equipement", id));
+    public EquipementResponse findById(Long id) {
+        return equipementMapper.toResponse(getOrThrow(id));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Equipement> findAll() {
-        return equipementRepository.findAll();
+    public List<EquipementResponse> findAll() {
+        return equipementRepository.findAll().stream().map(equipementMapper::toResponse).toList();
     }
 
     @Override
     @Transactional
-    public Equipement update(Long id, Equipement equipement) {
-        Equipement existant = findById(id);
-        valider(equipement);
-        existant.setLibelle(equipement.getLibelle());
-        return equipementRepository.save(existant);
+    public EquipementResponse update(Long id, EquipementRequest request) {
+        Equipement existant = getOrThrow(id);
+        equipementMapper.updateEntity(existant, request);
+        return equipementMapper.toResponse(equipementRepository.save(existant));
     }
 
     @Override
@@ -56,13 +55,8 @@ public class EquipementServiceImpl implements IEquipementService {
         equipementRepository.deleteById(id);
     }
 
-    private void valider(Equipement equipement) {
-        exigerTexte(equipement.getLibelle(), "libelle");
-    }
-
-    private static void exigerTexte(String valeur, String champ) {
-        if (valeur == null || valeur.isBlank()) {
-            throw new IllegalArgumentException("Le champ " + champ + " est obligatoire");
-        }
+    private Equipement getOrThrow(Long id) {
+        return equipementRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Equipement", id));
     }
 }

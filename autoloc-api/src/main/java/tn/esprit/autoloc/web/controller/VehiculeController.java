@@ -1,11 +1,12 @@
 package tn.esprit.autoloc.web.controller;
 
+import java.util.List;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,7 +18,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import tn.esprit.autoloc.domain.Vehicule;
+import tn.esprit.autoloc.dto.request.VehiculeRequest;
+import tn.esprit.autoloc.dto.response.VehiculeResponse;
 import tn.esprit.autoloc.service.IVehiculeService;
 
 @RestController
@@ -29,15 +31,16 @@ public class VehiculeController {
     private final IVehiculeService vehiculeService;
 
     @Operation(summary = "Creer un vehicule",
-            description = "Cree un nouvel enregistrement. L'identifiant est genere par la base : il ne doit pas etre fourni.")
+            description = "L'identifiant est genere par la base : il ne doit pas etre fourni.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Creation reussie"),
-            @ApiResponse(responseCode = "400", description = "Donnees invalides ou identifiant fourni")
+            @ApiResponse(responseCode = "400", description = "Donnees invalides"),
+            @ApiResponse(responseCode = "409", description = "Valeur deja utilisee (contrainte d'unicite)")
     })
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Vehicule create(@RequestBody Vehicule vehicule) {
-        return vehiculeService.create(vehicule);
+    public VehiculeResponse create(@Valid @RequestBody VehiculeRequest request) {
+        return vehiculeService.create(request);
     }
 
     @Operation(summary = "Consulter un vehicule par son identifiant")
@@ -46,14 +49,14 @@ public class VehiculeController {
             @ApiResponse(responseCode = "404", description = "Ressource introuvable")
     })
     @GetMapping("/{id}")
-    public Vehicule findById(@Parameter(description = "Identifiant du vehicule") @PathVariable Long id) {
+    public VehiculeResponse findById(@Parameter(description = "Identifiant") @PathVariable Long id) {
         return vehiculeService.findById(id);
     }
 
     @Operation(summary = "Lister les vehicules")
-    @ApiResponse(responseCode = "200", description = "Liste des vehicules (eventuellement vide)")
+    @ApiResponse(responseCode = "200", description = "Liste (eventuellement vide)")
     @GetMapping
-    public List<Vehicule> findAll() {
+    public List<VehiculeResponse> findAll() {
         return vehiculeService.findAll();
     }
 
@@ -61,12 +64,13 @@ public class VehiculeController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Modification reussie"),
             @ApiResponse(responseCode = "400", description = "Donnees invalides"),
-            @ApiResponse(responseCode = "404", description = "Ressource introuvable")
+            @ApiResponse(responseCode = "404", description = "Ressource introuvable"),
+            @ApiResponse(responseCode = "409", description = "Valeur deja utilisee (contrainte d'unicite)")
     })
     @PutMapping("/{id}")
-    public Vehicule update(@Parameter(description = "Identifiant du vehicule") @PathVariable Long id,
-                           @RequestBody Vehicule vehicule) {
-        return vehiculeService.update(id, vehicule);
+    public VehiculeResponse update(@Parameter(description = "Identifiant") @PathVariable Long id,
+                              @Valid @RequestBody VehiculeRequest request) {
+        return vehiculeService.update(id, request);
     }
 
     @Operation(summary = "Supprimer un vehicule")
@@ -76,7 +80,7 @@ public class VehiculeController {
     })
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteById(@Parameter(description = "Identifiant du vehicule") @PathVariable Long id) {
+    public void deleteById(@Parameter(description = "Identifiant") @PathVariable Long id) {
         vehiculeService.deleteById(id);
     }
 }

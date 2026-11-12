@@ -1,11 +1,20 @@
 package tn.esprit.autoloc.service.impl;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tn.esprit.autoloc.domain.Agence;
+import tn.esprit.autoloc.domain.Equipement;
 import tn.esprit.autoloc.domain.Vehicule;
+import tn.esprit.autoloc.dto.request.VehiculeRequest;
+import tn.esprit.autoloc.dto.response.VehiculeResponse;
 import tn.esprit.autoloc.exception.ResourceNotFoundException;
+import tn.esprit.autoloc.mapper.VehiculeMapper;
+import tn.esprit.autoloc.repository.IAgenceRepository;
+import tn.esprit.autoloc.repository.IEquipementRepository;
 import tn.esprit.autoloc.repository.IVehiculeRepository;
 import tn.esprit.autoloc.service.IVehiculeService;
 
@@ -14,43 +23,39 @@ import tn.esprit.autoloc.service.IVehiculeService;
 public class VehiculeServiceImpl implements IVehiculeService {
 
     private final IVehiculeRepository vehiculeRepository;
+    private final VehiculeMapper vehiculeMapper;
+    private final IAgenceRepository agenceRepository;
+    private final IEquipementRepository equipementRepository;
 
     @Override
     @Transactional
-    public Vehicule create(Vehicule vehicule) {
-        if (vehicule.getIdVehicule() != null) {
-            throw new IllegalArgumentException("Un nouveau vehicule ne doit pas avoir d'identifiant");
-        }
-        valider(vehicule);
-        return vehiculeRepository.save(vehicule);
+    public VehiculeResponse create(VehiculeRequest request) {
+        Agence agence = chargerAgence(request.agenceId());
+        Set<Equipement> equipements = chargerEquipements(request.equipementIds());
+        Vehicule entity = vehiculeMapper.toEntity(request, agence, equipements);
+        return vehiculeMapper.toResponse(vehiculeRepository.save(entity));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Vehicule findById(Long id) {
-        return vehiculeRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Vehicule", id));
+    public VehiculeResponse findById(Long id) {
+        return vehiculeMapper.toResponse(getOrThrow(id));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Vehicule> findAll() {
-        return vehiculeRepository.findAll();
+    public List<VehiculeResponse> findAll() {
+        return vehiculeRepository.findAll().stream().map(vehiculeMapper::toResponse).toList();
     }
 
     @Override
     @Transactional
-    public Vehicule update(Long id, Vehicule vehicule) {
-        Vehicule existant = findById(id);
-        valider(vehicule);
-        existant.setImmatriculation(vehicule.getImmatriculation());
-        existant.setMarque(vehicule.getMarque());
-        existant.setModele(vehicule.getModele());
-        existant.setCategorie(vehicule.getCategorie());
-        existant.setTarifJournalier(vehicule.getTarifJournalier());
-        existant.setStatut(vehicule.getStatut());
-        existant.setAgence(vehicule.getAgence());
-        return vehiculeRepository.save(existant);
+    public VehiculeResponse update(Long id, VehiculeRequest request) {
+        Vehicule existant = getOrThrow(id);
+        Agence agence = chargerAgence(request.agenceId());
+        Set<Equipement> equipements = chargerEquipements(request.equipementIds());
+        vehiculeMapper.updateEntity(existant, request, agence, equipements);
+        return vehiculeMapper.toResponse(vehiculeRepository.save(existant));
     }
 
     @Override
@@ -62,18 +67,31 @@ public class VehiculeServiceImpl implements IVehiculeService {
         vehiculeRepository.deleteById(id);
     }
 
-    private void valider(Vehicule vehicule) {
-        exigerTexte(vehicule.getImmatriculation(), "immatriculation");
-        exigerTexte(vehicule.getMarque(), "marque");
-        exigerTexte(vehicule.getModele(), "modele");
-        if (vehicule.getTarifJournalier() == null || vehicule.getTarifJournalier().signum() < 0) {
-            throw new IllegalArgumentException("Le tarif journalier doit etre positif ou nul");
-        }
+    private Vehicule getOrThrow(Long id) {
+        return vehiculeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Vehicule", id));
     }
 
-    private static void exigerTexte(String valeur, String champ) {
-        if (valeur == null || valeur.isBlank()) {
-            throw new IllegalArgumentException("Le champ " + champ + " est obligatoire");
+    /** Relation facultative : si agenceId est absent, la valeur reste null. */
+    private Agence chargerAgence(Long id) {
+        if (id == null) {
+            return null;
         }
+        return agenceRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Agence", id));
+    }
+
+    private Set<Equipement> chargerEquipements(Set<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return new HashSet<>();
+        }
+        Set<Equipement> trouves = new HashSet<>(equipementRepository.findAllById(ids));
+        for (Long id : ids) {
+            boolean present = trouves.stream().anyMatch(eq -> eq.getIdEquipement().equals(id));
+            if (!present) {
+                throw new ResourceNotFoundException("Equipement", id);
+            }
+        }
+        return trouves;
     }
 }

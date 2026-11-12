@@ -783,6 +783,159 @@
           }
         }
       ]
+    },
+    {
+      "name": "5 - Atelier 6 - Validation et erreurs",
+      "item": [
+        {
+          "name": "Client : plusieurs champs invalides (400 + fieldErrors)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/clients",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "clients"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"\",\n  \"prenom\": \"Sami\",\n  \"email\": \"pas-un-email\",\n  \"telephone\": \"abc\",\n  \"numPermis\": \"TN1\",\n  \"dateInscription\": \"2099-01-01\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Vehicule : categorie inconnue (400 JSON illisible)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/vehicules",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "vehicules"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"immatriculation\": \"1 TUN 1\",\n  \"marque\": \"Peugeot\",\n  \"modele\": \"208\",\n  \"categorie\": \"FUSEE\",\n  \"tarifJournalier\": 85,\n  \"statut\": \"DISPONIBLE\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Reservation : dateFin avant dateDebut (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/reservations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reservations"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vehiculeId\": 1,\n  \"clientId\": 1,\n  \"dateDebut\": \"2026-12-10\",\n  \"dateFin\": \"2026-12-01\",\n  \"statut\": \"EN_ATTENTE\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Reservation : vehicule inexistant (404)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/reservations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reservations"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vehiculeId\": 9999,\n  \"clientId\": 1,\n  \"dateDebut\": \"2026-12-01\",\n  \"dateFin\": \"2026-12-10\",\n  \"statut\": \"EN_ATTENTE\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Client : email deja utilise (409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/clients",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "clients"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Ben Ali\",\n  \"prenom\": \"Sami\",\n  \"email\": \"sami.benali@example.com\",\n  \"telephone\": \"20123456\",\n  \"numPermis\": \"TN-AUTRE\",\n  \"dateInscription\": \"2026-10-17\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Client : id non numerique (400)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/clients/abc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "clients",
+                "abc"
+              ]
+            }
+          }
+        }
+      ]
     }
   ]
 }
