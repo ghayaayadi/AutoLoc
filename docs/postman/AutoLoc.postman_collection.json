@@ -936,6 +936,287 @@
           }
         }
       ]
+    },
+    {
+      "name": "6 - Atelier 7 - Affectations",
+      "item": [
+        {
+          "name": "Affecter une reservation a un client",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/affectations/reservations/1/client?nom=Ben Ali&prenom=Sami",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "affectations",
+                "reservations",
+                "1",
+                "client"
+              ],
+              "query": [
+                {
+                  "key": "nom",
+                  "value": "Ben Ali"
+                },
+                {
+                  "key": "prenom",
+                  "value": "Sami"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Affecter un equipement a un vehicule",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/affectations/vehicules/1/equipements/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "affectations",
+                "vehicules",
+                "1",
+                "equipements",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Affecter une maintenance a un vehicule",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 201\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/affectations/maintenances?description=Vidange et controle des freins&immatriculation=123 TUN 4567",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "affectations",
+                "maintenances"
+              ],
+              "query": [
+                {
+                  "key": "description",
+                  "value": "Vidange et controle des freins"
+                },
+                {
+                  "key": "immatriculation",
+                  "value": "123 TUN 4567"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Affecter un contrat a une reservation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 201\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/affectations/contrats?dateSignature=2026-11-20&dateDebut=2026-11-25&dateFin=2026-11-30",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "affectations",
+                "contrats"
+              ],
+              "query": [
+                {
+                  "key": "dateSignature",
+                  "value": "2026-11-20"
+                },
+                {
+                  "key": "dateDebut",
+                  "value": "2026-11-25"
+                },
+                {
+                  "key": "dateFin",
+                  "value": "2026-11-30"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Creer reservation + contrat",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 201\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/affectations/reservations-avec-contrat",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "affectations",
+                "reservations-avec-contrat"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dateDebut\": \"2026-12-01\",\n  \"dateFin\": \"2026-12-05\",\n  \"vehiculeId\": 1,\n  \"clientId\": 1,\n  \"dateSignature\": \"2026-11-28\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Erreur 400 - parametre nom manquant",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/affectations/reservations/1/client?prenom=Sami",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "affectations",
+                "reservations",
+                "1",
+                "client"
+              ],
+              "query": [
+                {
+                  "key": "prenom",
+                  "value": "Sami"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Erreur 404 - client introuvable",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Statut 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/affectations/reservations/1/client?nom=Inconnu&prenom=Personne",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "affectations",
+                "reservations",
+                "1",
+                "client"
+              ],
+              "query": [
+                {
+                  "key": "nom",
+                  "value": "Inconnu"
+                },
+                {
+                  "key": "prenom",
+                  "value": "Personne"
+                }
+              ]
+            }
+          }
+        }
+      ]
     }
   ]
 }

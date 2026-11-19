@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -54,6 +55,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiError> handleTypeMismatch(MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
         return build(HttpStatus.BAD_REQUEST,
                 "Le parametre '" + ex.getName() + "' a une valeur invalide : " + ex.getValue(), request, null);
+    }
+
+    /** 400 : parametre de requete obligatoire absent (ex. ?nom= manquant). */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ApiError> handleMissingParam(MissingServletRequestParameterException ex,
+                                                       HttpServletRequest request) {
+        return build(HttpStatus.BAD_REQUEST,
+                "Le parametre obligatoire '" + ex.getParameterName() + "' est manquant", request, null);
     }
 
     /** 400 : regle de gestion violee dans un service (ex. dateFin avant dateDebut). */
